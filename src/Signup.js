@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
 import * as yup from "yup";
 import schema from "./validation/signupSchema";
+import { useHistory } from "react-router-dom";
 
 export default function Signup() {
   const initialFormValues = {
@@ -12,24 +14,30 @@ export default function Signup() {
     password: "",
     preferredCurrency: "",
     primaryLanguage: "",
-    userName: "",
+    username: "",
   };
 
-  const initialFormErrors = {
-    city: "",
-    country: "",
-    email: "",
-    firstName: "",
-    lastName: "",
-    password: "",
-    preferredCurrency: "",
-    primaryLanguage: "",
-    userName: "",
+  const [formValues, setFormValues] = useState(initialFormValues);
+  const [formErrors, setFormErrors] = useState(initialFormValues);
+  const [disabled, setDisabled] = useState(true);
+
+  const { push } = useHistory();
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .post(
+        "https://african-marketplace-tt7.herokuapp.com/createnewuser",
+        formValues
+      )
+      .then((res) => {
+        setFormValues(initialFormValues);
+        push("/Login");
+      })
+      .catch((err) => {
+        debugger;
+      });
   };
-
-  const initialDisabled = true;
-
-  const onSubmit = () => {};
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -56,9 +64,14 @@ export default function Signup() {
     });
   };
 
-  const [formValues, setFormValues] = useState(initialFormValues);
-  const [formErrors, setFormErrors] = useState(initialFormErrors);
-  const [disabled, setDisabled] = useState(initialDisabled);
+  useEffect(() => {
+    yup
+      .reach(schema)
+      .validate(formValues)
+      .then((valid) => {
+        setDisabled(!valid);
+      });
+  }, [formValues]);
 
   return (
     <div>
@@ -68,9 +81,9 @@ export default function Signup() {
         <form onSubmit={onSubmit}>
           <div>
             <input
-              value={formValues.userName}
+              value={formValues.username}
               onChange={onChange}
-              name="userName"
+              name="username"
               type="text"
               placeholder="Username"
             />

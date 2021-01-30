@@ -8,7 +8,7 @@ import Home from "./Home";
 function App() {
   return (
     <div>
-      <Header />;
+      <Header />
       <Switch>
         <Route path="/Signup">
           <Signup />
